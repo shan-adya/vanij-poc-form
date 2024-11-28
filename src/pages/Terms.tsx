@@ -79,7 +79,7 @@ export default function Terms() {
         className="space-y-8"
       >
         {/* Pricing Preview */}
-        <div className="p-6 glass rounded-lg mb-8">
+        {/* <div className="p-6 glass rounded-lg mb-8">
           <h3 className="text-lg font-semibold mb-4">Pricing Preview</h3>
           <div className="space-y-2">
             {selectedServices.map(service => (
@@ -98,7 +98,7 @@ export default function Terms() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Terms Checkboxes */}
         <div className="space-y-4">
