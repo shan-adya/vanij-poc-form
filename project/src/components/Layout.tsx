@@ -16,14 +16,18 @@ const STEPS = [
     description: "Fill in your information"
   },
   {
-    title: "Review",
+    title: "Terms",
+    description: "Review terms"
+  },
+  {
+    title: "Summary",
     description: "Confirm your request"
   }
 ];
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
-  const steps = ['/', '/details', '/summary'];
+  const steps = ['/', '/details', '/terms', '/summary'];
   const currentStep = steps.indexOf(location.pathname) + 1;
 
   return (

@@ -1,15 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import ServiceCard from '@/components/ServiceCard';
+import TermsModal from '@/components/TermsModal';
 import { useService } from '@/contexts/ServiceContext';
 import { SERVICES } from '@/lib/constants';
 import { Service } from '@/types';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 
 export default function ServiceSelection() {
   const navigate = useNavigate();
   const { selectedServices, setSelectedServices } = useService();
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const toggleService = (service: Service) => {
     const isSelected = selectedServices.some((s) => s.id === service.id);
@@ -21,7 +26,7 @@ export default function ServiceSelection() {
   };
 
   const handleNext = () => {
-    if (selectedServices.length > 0) {
+    if (selectedServices.length > 0 && termsAccepted) {
       navigate('/details');
     }
   };
@@ -37,8 +42,8 @@ export default function ServiceSelection() {
   };
 
   const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }
   };
 
   return (
@@ -108,15 +113,39 @@ export default function ServiceSelection() {
           </div>
         </div>
 
-        <Button
-          size="lg"
-          onClick={handleNext}
-          disabled={selectedServices.length === 0}
-          className="gradient-hover bg-gradient-to-r from-primary to-secondary text-white"
-        >
-          Continue
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex flex-col items-end gap-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="terms"
+              checked={termsAccepted}
+              onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+              className="border-primary"
+            />
+            <label
+              htmlFor="terms"
+              className="text-sm text-muted-foreground cursor-pointer"
+            >
+              I accept the{" "}
+              <button
+                type="button"
+                onClick={() => setShowTermsModal(true)}
+                className="text-primary hover:underline focus:outline-none"
+              >
+                terms and conditions
+              </button>
+            </label>
+          </div>
+
+          <Button
+            size="lg"
+            onClick={handleNext}
+            disabled={selectedServices.length === 0 || !termsAccepted}
+            className="gradient-hover bg-gradient-to-r from-primary to-secondary text-white"
+          >
+            Continue
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       </motion.div>
 
       {/* Pricing Disclaimer */}
@@ -129,6 +158,11 @@ export default function ServiceSelection() {
         <p>* All prices are base estimates. Final pricing may vary based on specific requirements.</p>
         <p>* Cloud usage and third-party service charges will be calculated separately.</p>
       </motion.div>
+
+      <TermsModal 
+        open={showTermsModal} 
+        onOpenChange={setShowTermsModal} 
+      />
     </div>
   );
 }

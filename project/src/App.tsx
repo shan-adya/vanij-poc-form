@@ -1,32 +1,32 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/sonner';
-import ServiceSelection from '@/pages/ServiceSelection';
-import DetailsForm from '@/pages/DetailsForm';
-import Summary from '@/pages/Summary';
-import Dashboard from '@/pages/Dashboard';
-import Layout from '@/components/Layout';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { ServiceProvider } from '@/contexts/ServiceContext';
-import './App.css';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import BackgroundGradient from '@/components/BackgroundGradient';
+import ServiceSelection from './pages/ServiceSelection';
+import Details from './pages/DetailsForm';
+import Terms from './pages/Terms';
+import Summary from './pages/Summary';
+import Layout from './components/Layout';
+import { FormProvider } from '@/contexts/FormContext';
+import Dashboard from './pages/Dashboard';
 
-function App() {
+export default function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <ServiceProvider>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<ServiceSelection />} />
-              <Route path="/details" element={<DetailsForm />} />
-              <Route path="/summary" element={<Summary />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-            </Routes>
-          </Layout>
-          <Toaster />
-        </ServiceProvider>
-      </AuthProvider>
-    </Router>
+    <BrowserRouter>
+      <BackgroundGradient />
+      <div className="min-h-screen relative">
+        <Layout>
+          <FormProvider>
+            <div className="relative z-10">
+              <Routes>
+                <Route path="/" element={<ServiceSelection />} />
+                <Route path="/details" element={<Details />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/summary" element={<Summary />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+              </Routes>
+            </div>
+          </FormProvider>
+        </Layout>
+      </div>
+    </BrowserRouter>
   );
 }
-
-export default App;

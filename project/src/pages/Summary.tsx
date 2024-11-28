@@ -6,6 +6,7 @@ import { useService } from '@/contexts/ServiceContext';
 import { formatCurrency } from '@/lib/utils';
 import RequestSummary from '@/components/RequestSummary';
 import UserDetailsSummary from '@/components/UserDetailsSummary';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Summary() {
   const navigate = useNavigate();
@@ -18,6 +19,11 @@ export default function Summary() {
   const handleSubmit = () => {
     // In a real app, we would submit the request to an API here
     navigate('/dashboard');
+  };
+
+  const handleBack = () => {
+    // Go back to Details if Custom LLM, otherwise to Terms
+    navigate(isOnlyCustomLLM ? "/details" : "/terms");
   };
 
   return (
@@ -47,7 +53,13 @@ export default function Summary() {
                 : "Please review all the information above carefully. Once submitted, our team will review your request and get back to you within 24-48 hours."}
             </p>
             <div className="flex justify-between items-center">
-              <Button variant="outline" onClick={() => navigate('/details')}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleBack}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
               <Button onClick={handleSubmit}>Submit Request</Button>
