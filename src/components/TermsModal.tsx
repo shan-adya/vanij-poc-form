@@ -26,7 +26,7 @@ export default function TermsModal({ open, onOpenChange }: TermsModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[80vh]">
+      <DialogContent className="max-w-5xl h-[80vh]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
             Terms and Conditions
@@ -35,8 +35,8 @@ export default function TermsModal({ open, onOpenChange }: TermsModalProps) {
             Please read our terms and conditions carefully
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-full pr-4">
-          <div className="prose prose-sm dark:prose-invert">
+        <ScrollArea className="h-full px-4">
+          <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-ul:text-muted-foreground">
             <Markdown>{terms}</Markdown>
           </div>
         </ScrollArea>

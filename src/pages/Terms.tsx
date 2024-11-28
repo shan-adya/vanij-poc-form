@@ -108,19 +108,19 @@ export default function Terms() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border"
+              className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border cursor-pointer"
+              onClick={() => handleTermToggle(term.id)}
             >
               <Checkbox
                 id={term.id}
                 checked={acceptedTerms.includes(term.id)}
-                onCheckedChange={() => handleTermToggle(term.id)}
+                // onCheckedChange={() => handleTermToggle(term.id)}
               />
-              <label
-                htmlFor={term.id}
-                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              <div
+                className="text-sm leading-none cursor-pointer"
               >
                 {term.label}
-              </label>
+              </div>
             </motion.div>
           ))}
         </div>

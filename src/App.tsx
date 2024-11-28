@@ -1,32 +1,37 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import BackgroundGradient from '@/components/BackgroundGradient';
-import ServiceSelection from './pages/ServiceSelection';
-import Details from './pages/DetailsForm';
-import Terms from './pages/Terms';
-import Summary from './pages/Summary';
-import Layout from './components/Layout';
-import { FormProvider } from '@/contexts/FormContext';
-import Dashboard from './pages/Dashboard';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ServiceSelection from "./pages/ServiceSelection";
+import Details from "./pages/DetailsForm";
+import Terms from "./pages/Terms";
+import Summary from "./pages/Summary";
+import Layout from "./components/Layout";
+import { FormProvider } from "@/contexts/FormContext";
+import Dashboard from "./pages/Dashboard";
+import ScrollToTop from "./components/ScrollToTop";
+import { ServiceProvider } from "./contexts/ServiceContext";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLayout from "./pages/admin/AdminLayout";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <BackgroundGradient />
-      <div className="min-h-screen relative">
-        <Layout>
-          <FormProvider>
-            <div className="relative z-10">
-              <Routes>
-                <Route path="/" element={<ServiceSelection />} />
-                <Route path="/details" element={<Details />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/summary" element={<Summary />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-              </Routes>
-            </div>
-          </FormProvider>
-        </Layout>
-      </div>
-    </BrowserRouter>
+    <ServiceProvider>
+      <FormProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<ServiceSelection />} />
+              <Route path="details" element={<Details />} />
+              <Route path="terms" element={<Terms />} />
+              <Route path="summary" element={<Summary />} />
+              <Route path="dashboard" element={<Dashboard />} />
+            </Route>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </FormProvider>
+    </ServiceProvider>
   );
 }
