@@ -138,25 +138,35 @@ export default function DetailsForm() {
                   )}
                 />
                 <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-primary" />
-                        Phone
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="+1 234 567 8900" 
-                          {...field}
-                          className="bg-background/50"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    control={form.control}
+                    name="phone"
+                    render={({ field: { onChange, ...field } }) => (
+                        <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-primary" />
+                            Phone
+                        </FormLabel>
+                        <FormControl>
+                            <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                +91
+                            </span>
+                            <Input 
+                                {...field}
+                                className="pl-12 bg-background/50"
+                                placeholder="1234567890"
+                                maxLength={10}
+                                onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '');
+                                onChange(value);
+                                }}
+                            />
+                            </div>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
                 <FormField
                   control={form.control}
                   name="company"
