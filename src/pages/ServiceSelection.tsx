@@ -76,7 +76,7 @@ export default function ServiceSelection() {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12"
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 "
       >
         {SERVICES.map((service) => (
           <motion.div key={service.id} variants={item}>
@@ -149,7 +149,7 @@ export default function ServiceSelection() {
       </motion.div>
 
       {/* Pricing Disclaimer */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
@@ -157,7 +157,7 @@ export default function ServiceSelection() {
       >
         <p>* All prices are base estimates. Final pricing may vary based on specific requirements.</p>
         <p>* Cloud usage and third-party service charges will be calculated separately.</p>
-      </motion.div>
+      </motion.div> */}
 
       <TermsModal 
         open={showTermsModal} 

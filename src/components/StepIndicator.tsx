@@ -53,7 +53,7 @@ export default function StepIndicator({ steps, currentStep }: StepIndicatorProps
               </div>
 
               {/* Step Title & Description */}
-              <div className="mt-3 space-y-1 text-center">
+              <div className="mt-1 space-y-0.5 text-center">
                 <div
                   className={cn(
                     "text-sm font-medium",

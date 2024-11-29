@@ -79,7 +79,7 @@ export default function Terms() {
         className="space-y-8"
       >
         {/* Pricing Preview */}
-        <div className="p-6 glass rounded-lg mb-8">
+        {/* <div className="p-6 glass rounded-lg mb-8">
           <h3 className="text-lg font-semibold mb-4">Pricing Preview</h3>
           <div className="space-y-2">
             {selectedServices.map(service => (
@@ -98,7 +98,7 @@ export default function Terms() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Terms Checkboxes */}
         <div className="space-y-4">
@@ -108,19 +108,19 @@ export default function Terms() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border"
+              className="flex items-start space-x-3 p-4 rounded-lg bg-background/50 border cursor-pointer"
+              onClick={() => handleTermToggle(term.id)}
             >
               <Checkbox
                 id={term.id}
                 checked={acceptedTerms.includes(term.id)}
-                onCheckedChange={() => handleTermToggle(term.id)}
+                // onCheckedChange={() => handleTermToggle(term.id)}
               />
-              <label
-                htmlFor={term.id}
-                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              <div
+                className="text-sm leading-none cursor-pointer"
               >
                 {term.label}
-              </label>
+              </div>
             </motion.div>
           ))}
         </div>

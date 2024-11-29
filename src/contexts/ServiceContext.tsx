@@ -5,7 +5,15 @@ interface ServiceContextType {
   selectedServices: Service[];
   userDetails: UserDetails | null;
   setSelectedServices: (services: Service[]) => void;
-  setUserDetails: (details: UserDetails) => void;
+  setUserDetails: (details: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    company: string;
+    designation: string;
+    useCase: string;
+  }) => void;
   totalPrice: number;
 }
 
