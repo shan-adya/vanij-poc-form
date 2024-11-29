@@ -7,6 +7,7 @@ import Summary from './pages/Summary';
 import Layout from './components/Layout';
 import { FormProvider } from '@/contexts/FormContext';
 import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <FormProvider>
             <div className="relative z-10">
               <Routes>
+                <Route path="/login" element={<Login />} />
                 <Route path="/" element={<ServiceSelection />} />
                 <Route path="/details" element={<Details />} />
                 <Route path="/terms" element={<Terms />} />

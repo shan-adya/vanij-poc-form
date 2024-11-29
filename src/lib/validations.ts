@@ -11,3 +11,12 @@ export const detailsFormSchema = z.object({
   useCase: z.string().min(10, "Please provide more details about your use case"),
 });
 export type DetailsFormValues = z.infer<typeof detailsFormSchema>;
+
+export const loginFormSchema = z.object({
+  email: z.string()
+    .email("Please enter a valid email address")
+    .min(1, "Email is required"),
+  otp: z.string()
+    .length(6, "OTP must be exactly 6 digits")
+    .regex(/^\d+$/, "OTP must contain only numbers")
+});
