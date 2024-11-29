@@ -56,8 +56,15 @@ export default function Login() {
   const handleOTPSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      await verifyOTP(userId, data.otp);
+      const response = await verifyOTP(userId, data.otp);
       toast.success("Login successful!");
+      
+      // Role-based redirection
+      if (response.data.roles === "ADMIN") {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       form.resetField("otp");
     } finally {
