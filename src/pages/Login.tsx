@@ -16,19 +16,19 @@ import {
 } from "@/components/ui/form";
 import { Mail, Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from '@/contexts/AuthContext';
 
 type LoginFormValues = {
   email: string;
   otp: string;
 };
 
-const ADMIN_EMAIL = "admin@example.com";
-const ADMIN_OTP = "777777";
-
 export default function Login() {
   const navigate = useNavigate();
   const [showOTP, setShowOTP] = useState(false);
-  const [emailForOTP, setEmailForOTP] = useState("");
+  const [userId, setUserId] = useState("");
+  const { login, verifyOTP } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -38,22 +38,38 @@ export default function Login() {
     },
   });
 
-  const handleEmailSubmit = (data: { email: string }) => {
-    setEmailForOTP(data.email);
-    setShowOTP(true);
-    toast.success("OTP sent successfully!");
+  const handleEmailSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true);
+    try {
+      const response = await login(data.email);
+    //   console.log("Response:", response);
+      setUserId(response.data.id);
+      setShowOTP(true);
+      toast.success("OTP sent successfully!");
+    } catch (error) {
+      form.reset();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleOTPSubmit = (data: LoginFormValues) => {
-    if (data.email === ADMIN_EMAIL && data.otp === ADMIN_OTP) {
-      toast.success("Welcome back, Admin!");
-      navigate("/dashboard");
-    } else if (data.otp === "123456") { // Demo client OTP
-      toast.success("Welcome back!");
-      navigate("/dashboard");
-    } else {
-      toast.error("Invalid OTP. Please try again.");
+  const handleOTPSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true);
+    try {
+      await verifyOTP(userId, data.otp);
+      toast.success("Login successful!");
+    } catch (error) {
       form.resetField("otp");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmit = async (data: LoginFormValues) => {
+    if (!showOTP) {
+      await handleEmailSubmit(data);
+    } else {
+      await handleOTPSubmit(data);
     }
   };
 
@@ -83,7 +99,7 @@ export default function Login() {
 
           <Form {...form}>
             <form 
-              onSubmit={form.handleSubmit(showOTP ? handleOTPSubmit : handleEmailSubmit)} 
+              onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-6"
             >
               <FormField
@@ -100,7 +116,7 @@ export default function Login() {
                         {...field}
                         type="email"
                         placeholder="Enter your email"
-                        disabled={showOTP}
+                        disabled={showOTP || isLoading}
                         className="bg-background/50"
                       />
                     </FormControl>
@@ -129,6 +145,7 @@ export default function Login() {
                             placeholder="Enter 6-digit OTP"
                             maxLength={6}
                             className="bg-background/50"
+                            disabled={isLoading}
                             onChange={(e) => {
                               const value = e.target.value.replace(/\D/g, '');
                               field.onChange(value);
@@ -145,15 +162,16 @@ export default function Login() {
               <Button
                 type="submit"
                 className="w-full gradient-hover bg-gradient-to-r from-primary to-secondary text-white"
+                disabled={isLoading}
               >
-                {showOTP ? (
-                  <>
-                    Verify OTP
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⚪</span>
+                    {showOTP ? "Verifying..." : "Sending OTP..."}
+                  </span>
                 ) : (
                   <>
-                    Send OTP
+                    {showOTP ? "Verify OTP" : "Send OTP"}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -164,6 +182,7 @@ export default function Login() {
                   type="button"
                   variant="ghost"
                   className="w-full"
+                  disabled={isLoading}
                   onClick={() => {
                     setShowOTP(false);
                     form.reset();

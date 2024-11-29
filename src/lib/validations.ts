@@ -18,9 +18,11 @@ export type DetailsFormValues = z.infer<typeof detailsFormSchema>;
 
 export const loginFormSchema = z.object({
   email: z.string()
-    .email("Please enter a valid email address")
-    .min(1, "Email is required"),
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
   otp: z.string()
-    .length(6, "OTP must be exactly 6 digits")
-    .regex(/^\d+$/, "OTP must contain only numbers")
+    .optional()
+    .transform((val) => val || "")  // Handle empty OTP for first step
 });
+
+export type LoginFormValues = z.infer<typeof loginFormSchema>;
