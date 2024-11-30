@@ -33,7 +33,7 @@ import { motion } from "framer-motion";
 
 export default function DetailsForm() {
   const navigate = useNavigate();
-  const { selectedServices, setUserDetails } = useService();
+  const { selectedServices, setUserDetails, projectData } = useService();
   const { formDetails, setFormDetails } = useForm();
 
   const form = useHookForm<DetailsFormValues>({
@@ -50,10 +50,10 @@ export default function DetailsForm() {
   });
 
   useEffect(() => {
-    if (selectedServices.length === 0) {
-      navigate("/");
+    if (selectedServices.length === 0 && !projectData) {
+      navigate("/services");
     }
-  }, [selectedServices, navigate]);
+  }, [selectedServices, projectData, navigate]);
 
   const onSubmit = (data: DetailsFormValues) => {
     const submissionData = {

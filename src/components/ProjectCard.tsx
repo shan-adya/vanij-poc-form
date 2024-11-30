@@ -1,20 +1,34 @@
 import { Project } from '@/types/project';
-import { Card } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getStatusConfig } from '@/lib/utils/status';
 import { useNavigate } from 'react-router-dom';
+import { DropdownMenu } from '@/components/ui/dropdown-menu';
 
-export function ProjectCard({ project }: { project: Project }) {
+interface ProjectCardProps {
+  project: Project;
+  isClientView?: boolean;
+}
+
+export function ProjectCard({ project, isClientView }: ProjectCardProps) {
   const navigate = useNavigate();
   const statusConfig = getStatusConfig(project.status);
 
   // Default to empty array if services is null
   const services = project.services || [];
 
+  const handleClick = () => {
+    if (isClientView) {
+      navigate(`/client/projects/${project.id}`);
+    } else {
+      navigate(`/admin/projects/${project.id}`);
+    }
+  };
+
   return (
     <Card 
       className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-      onClick={() => navigate(`/admin/projects/${project.id}`)}
+      onClick={handleClick}
     >
       <div className="space-y-4">
         <div className="flex items-start justify-between">

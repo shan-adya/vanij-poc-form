@@ -1,9 +1,12 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useService } from '@/contexts/ServiceContext';
+import { projectsApi } from '@/lib/api/projects';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import ServiceCard from '@/components/ServiceCard';
 import TermsModal from '@/components/TermsModal';
-import { useService } from '@/contexts/ServiceContext';
 import { SERVICES } from '@/lib/constants';
 import { Service } from '@/types';
 import { motion } from 'framer-motion';
@@ -11,10 +14,66 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ServiceSelection() {
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { selectedServices, setSelectedServices } = useService();
+  const { 
+    setProjectData, 
+    setProjectId,
+    selectedServices,
+    setSelectedServices 
+  } = useService();
+  const [isLoading, setIsLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+
+  useEffect(() => {
+    const projectId = searchParams.get('projectId');
+    if (projectId) {
+      const fetchProject = async () => {
+        setIsLoading(true);
+        try {
+          const response = await projectsApi.getById(projectId);
+          const project = response.data;
+          
+          if (!project) {
+            toast.error("Project not found");
+            return;
+          }
+
+          setProjectData(project);
+          setProjectId(projectId);
+          
+          // Pre-select the services from the project
+          if (project.services && project.services.length > 0) {
+            setSelectedServices(project.services.map(service => ({
+              id: service.service_name.toLowerCase().replace(/ /g, '-'),
+              name: service.service_name,
+              description: service.service_description,
+              price: service.cost
+            })));
+          }
+          
+        } catch (error) {
+          console.error('Error fetching project:', error);
+          toast.error("Failed to load project details");
+          setProjectData(null);
+          setProjectId(null);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchProject();
+    }
+  }, [searchParams, setProjectData, setProjectId, setSelectedServices]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
 
   const toggleService = (service: Service) => {
     const isSelected = selectedServices.some((s) => s.id === service.id);

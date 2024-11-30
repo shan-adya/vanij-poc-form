@@ -35,7 +35,7 @@ export const projectsApi = {
   // Update project
   update: async (id: string | number, data: Partial<Project>) => {
     const response = await api.post<ProjectDetailResponse>(`/project/update/${id}`, {
-      data: {
+    //   data: {
         ...data,
         // Maintain the same structure as the get response
         project_name: data.project_name,
@@ -43,7 +43,7 @@ export const projectsApi = {
         status: data.status,
         services: data.services,
         tasks: data.tasks,
-      }
+    //   }
     });
     return response.data;
   },

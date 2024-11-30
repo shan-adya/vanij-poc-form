@@ -14,9 +14,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Mail, Lock, ArrowRight } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from '@/contexts/AuthContext';
+import { userApi } from '@/lib/api/user';
+import { authApi } from '@/lib/api/auth';
 
 type LoginFormValues = {
   email: string;
@@ -41,12 +43,18 @@ export default function Login() {
   const handleEmailSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      const response = await login(data.email);
-    //   console.log("Response:", response);
+      const response = await authApi.login(data.email);
+      console.log("Response:", response);
+      if (!response.meta.status) {
+        throw new Error(response.meta.message || 'Failed to send OTP');
+      }
+
       setUserId(response.data.id);
       setShowOTP(true);
       toast.success("OTP sent successfully!");
     } catch (error) {
+      console.error('Send OTP error:', error);
+      toast.error(error.message || 'Failed to send OTP');
       form.reset();
     } finally {
       setIsLoading(false);
@@ -56,16 +64,39 @@ export default function Login() {
   const handleOTPSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      const response = await verifyOTP(userId, data.otp);
+      // First verify OTP
+      const verifyResponse = await verifyOTP(userId, data.otp);
+    
+      //set token
+      localStorage.setItem('token', verifyResponse.data.token);
+      
+      if (!verifyResponse.meta.status) {
+        throw new Error(verifyResponse.meta.message || 'OTP verification failed');
+      }
+
+      // Get user data using the userId we already have
+      const userResponse = await userApi.getById(userId);
+    //   console.log("User Response:", userResponse);
+      
+      if (!userResponse.data.meta.status) {
+        throw new Error(userResponse.data.meta.message || 'Failed to fetch user data');
+      }
+
+      // Set complete user data in context
+      const userData = await userResponse.data.data;
+      await login(userData);
+      
       toast.success("Login successful!");
       
       // Role-based redirection
-      if (response.data.roles === "ADMIN") {
+      if (userData.role === "ADMIN") {
         navigate('/admin');
       } else {
-        navigate('/');
+        navigate('/client');
       }
     } catch (error) {
+      console.error('Login error:', error);
+      toast.error(error.message || 'Login failed');
       form.resetField("otp");
     } finally {
       setIsLoading(false);
@@ -173,7 +204,7 @@ export default function Login() {
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
-                    <span className="animate-spin">⚪</span>
+                    <Loader2 className="h-4 w-4 animate-spin" /> 
                     {showOTP ? "Verifying..." : "Sending OTP..."}
                   </span>
                 ) : (
