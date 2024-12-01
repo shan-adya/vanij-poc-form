@@ -9,10 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock, Users, DollarSign, Mail, Phone, User, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, Clock, Users, DollarSign, Mail, Phone, User, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react';
 import { getStatusConfig } from '@/lib/utils/status';
 import { cn } from '@/lib/utils';
 import ProjectTermsModal from "@/components/ProjectTermsModal";
+import { flowUtils } from '@/lib/utils/flowState';
 
 interface AdminUser {
   first_name: string;
@@ -52,6 +53,23 @@ export default function ProjectDetails() {
   const [showAdminContact, setShowAdminContact] = useState(false);
 
   useEffect(() => {
+    const canAccessPage = flowUtils.canAccess('project-details', {
+      projectData,
+      projectId,
+      projectTermsAccepted: termsAccepted
+    });
+
+    if (!canAccessPage) {
+      const redirectPath = flowUtils.getRedirectPath('project-details', {
+        projectData,
+        projectId,
+        projectTermsAccepted: termsAccepted
+      });
+      navigate(redirectPath);
+    }
+  }, [projectData, projectId, termsAccepted, navigate]);
+
+  useEffect(() => {
     const fetchProject = async (id: string) => {
       setIsLoading(true);
       try {
@@ -60,6 +78,12 @@ export default function ProjectDetails() {
         
         if (!project) {
           toast.error("Project not found");
+          return;
+        }
+
+        if (project.user_id || project.user_details) {
+          setProjectData(null);
+          setProjectId(null);
           return;
         }
 
@@ -130,9 +154,71 @@ export default function ProjectDetails() {
 
   if (!projectData) {
     return (
-      <div className="text-center">
-        <h2 className="text-2xl font-bold">Project not found</h2>
-        <p className="text-muted-foreground mt-2">The requested project could not be found.</p>
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-primary">
+              Project Not Available
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <p className="text-center text-muted-foreground">
+              This project is already assigned to another user. Please contact our admin to get your own personalized project.
+            </p>
+
+            {/* Admin Contact Section */}
+            {isLoadingAdmin ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+              </div>
+            ) : adminData ? (
+              <div className="space-y-4 border rounded-lg p-6 bg-muted/10">
+                <h3 className="font-semibold text-center">Contact Admin</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="flex items-center gap-2 justify-center">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span>
+                      {adminData.first_name} {adminData.last_name}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 justify-center">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <a 
+                      href={`tel:${adminData.mobile_number}`}
+                      className="text-primary hover:underline"
+                    >
+                      {adminData.mobile_number}
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 justify-center">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <a 
+                      href={`mailto:${adminData.email}`}
+                      className="text-primary hover:underline"
+                    >
+                      {adminData.email}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground">
+                Admin contact information is currently unavailable
+              </p>
+            )}
+
+            <div className="flex justify-center pt-4">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/')}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Home
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -166,11 +252,6 @@ export default function ProjectDetails() {
         <div className="text-center">
           <h1 className="text-3xl font-bold">{projectData.project_name}</h1>
           <p className="text-muted-foreground mt-2">{projectData.project_description}</p>
-          <Badge 
-            className={cn("mt-4", getStatusConfig(projectData.status).className)}
-          >
-            {getStatusConfig(projectData.status).label}
-          </Badge>
         </div>
 
         {/* Services */}
@@ -184,35 +265,32 @@ export default function ProjectDetails() {
                 key={index}
                 className="border rounded-lg p-4 space-y-4"
               >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold">{service.service_name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {service.service_description}
-                    </p>
-                  </div>
-                  <Badge className={getStatusConfig(service.status).className}>
-                    {getStatusConfig(service.status).label}
-                  </Badge>
+                <div>
+                  <h3 className="font-semibold truncate" title={service.service_name}>
+                    {service.service_name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2" title={service.service_description}>
+                    {service.service_description}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
+                    <span className="text-sm truncate" title={service.others.estimated_timeline}>
                       Timeline: {service.others.estimated_timeline}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
+                    <span className="text-sm truncate" title={`Team Size: ${service.others.team_size} members`}>
                       Team Size: {service.others.team_size} members
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      Cost: ${service.cost.toLocaleString()}
+                    <span className="text-sm truncate" title={`Cost: ${service.cost}`}>
+                      Cost: {service.cost}
                     </span>
                   </div>
                 </div>

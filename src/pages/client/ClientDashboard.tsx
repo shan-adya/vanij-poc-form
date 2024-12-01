@@ -40,23 +40,24 @@ export default function ClientDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold">My Project</h2>
+        <h2 className="text-3xl font-bold truncate">My Project</h2>
       </div>
 
       {isLoading ? (
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
           {[1].map((n) => (
             <div key={n} className="h-[300px] bg-muted animate-pulse rounded-lg" />
           ))}
         </div>
       ) : projects.length > 0 ? (
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
           {projects.map((project) => (
-            <ProjectCard 
-              key={project.id} 
-              project={project}
-              isClientView={true} // Add this prop to disable edit/delete actions
-            />
+            <div key={project.id} className="min-w-0">
+              <ProjectCard 
+                project={project}
+                isClientView={true}
+              />
+            </div>
           ))}
         </div>
       ) : (

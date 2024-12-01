@@ -30,10 +30,10 @@ export default function AdminDashboardNew() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold">Projects</h2>
+        <h2 className="text-3xl font-bold truncate">Projects</h2>
         <Button 
           onClick={() => navigate("/admin/projects/new")}
-          className="bg-primary hover:bg-primary/90"
+          className="bg-primary hover:bg-primary/90 shrink-0 ml-4"
         >
           <Plus className="h-4 w-4 mr-2" />
           Create New Project
@@ -41,15 +41,17 @@ export default function AdminDashboardNew() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
           {[1, 2, 3].map((n) => (
             <div key={n} className="h-[300px] bg-muted animate-pulse rounded-lg" />
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
           {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+            <div key={project.id} className="min-w-0">
+              <ProjectCard project={project} />
+            </div>
           ))}
         </div>
       )}

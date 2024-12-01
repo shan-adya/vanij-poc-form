@@ -18,7 +18,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { projectsApi } from "@/lib/api/projects";
 import { toast } from "sonner";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Project } from "@/types/project";
 
 const SERVICE_OPTIONS = [
   "Build a custom LLM",
@@ -59,6 +60,8 @@ export default function CreateProject() {
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
+  const [projectData, setProjectData] = useState<Project | null>(null);
+
   const form = useForm<CreateProjectValues>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
@@ -87,6 +90,7 @@ export default function CreateProject() {
         try {
           const response = await projectsApi.getById(id);
           const project = response.data;
+          setProjectData(project);
 
           form.reset({
             project_name: project.project_name,
@@ -95,7 +99,8 @@ export default function CreateProject() {
               ...project.tasks?.map(task => ({
                 task_name: task.task_name,
                 is_default: task.task_name === "Fill up user details" || 
-                           task.task_name === "Agree to terms"
+                           task.task_name === "Agree to terms",
+                status: task.status
               })) || []
             ],
             services: (project.services || []).map(service => ({
@@ -125,16 +130,29 @@ export default function CreateProject() {
         project_name: data.project_name,
         project_description: data.project_description,
         status: "active",
-        tasks: data.tasks.map((task) => ({
-          task_name: task.task_name,
-          status: "pending"
-        })),
+        tasks: data.tasks.map((task) => {
+          if (isEditMode) {
+            const existingTask = projectData?.tasks?.find(
+              t => t.task_name === task.task_name
+            );
+            if (existingTask) {
+              return {
+                task_name: task.task_name,
+                status: existingTask.status
+              };
+            }
+          }
+          return {
+            task_name: task.task_name,
+            status: "pending"
+          };
+        }),
         services: data.services.map((service) => ({
           service_name: service.service_name,
           service_description: service.service_description,
           status: "planned",
-          cost: parseInt(service.cost),
-          poc_cost: parseInt(service.poc_cost),
+          cost: service.cost,
+          poc_cost: service.poc_cost,
           others: {
             estimated_timeline: service.others.estimated_timeline,
             team_size: parseInt(service.others.team_size),
@@ -234,10 +252,12 @@ export default function CreateProject() {
                         render={({ field }) => (
                           <FormItem className="flex-1">
                             <FormControl>
-                              <Input 
+                              <Textarea 
                                 {...field} 
-                                placeholder="Enter task name"
+                                placeholder="Enter task description"
                                 disabled={isDefaultTask}
+                                className="resize-none"
+                                rows={3}
                               />
                             </FormControl>
                             <FormMessage />
@@ -249,7 +269,7 @@ export default function CreateProject() {
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="text-destructive"
+                          className="text-destructive h-10"
                           onClick={() => removeTask(index)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -361,7 +381,7 @@ export default function CreateProject() {
                             <FormItem>
                               <FormLabel>Total Cost</FormLabel>
                               <FormControl>
-                                <Input {...field} type="number" placeholder="Enter cost" />
+                                <Input {...field} placeholder="e.g., Free, $200, Contact Us" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -375,7 +395,7 @@ export default function CreateProject() {
                             <FormItem>
                               <FormLabel>POC Cost</FormLabel>
                               <FormControl>
-                                <Input {...field} type="number" placeholder="Enter POC cost" />
+                                <Input {...field} placeholder="e.g., Free, $50, Contact Us" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -405,7 +425,7 @@ export default function CreateProject() {
                             <FormItem>
                               <FormLabel>Team Size</FormLabel>
                               <FormControl>
-                                <Input {...field} type="number" placeholder="Enter team size" />
+                                <Input {...field} placeholder="Enter team size" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

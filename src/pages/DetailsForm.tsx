@@ -30,10 +30,11 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { flowUtils } from '@/lib/utils/flowState';
 
 export default function DetailsForm() {
   const navigate = useNavigate();
-  const { selectedServices, setUserDetails, projectData } = useService();
+  const { selectedServices, setUserDetails, projectData, projectId } = useService();
   const { formDetails, setFormDetails } = useForm();
 
   const form = useHookForm<DetailsFormValues>({
@@ -50,10 +51,21 @@ export default function DetailsForm() {
   });
 
   useEffect(() => {
-    if (selectedServices.length === 0 && !projectData) {
-      navigate("/services");
+    const canAccessPage = flowUtils.canAccess('details', {
+      projectData,
+      projectId,
+      projectTermsAccepted: true
+    });
+
+    if (!canAccessPage) {
+      const redirectPath = flowUtils.getRedirectPath('details', {
+        projectData,
+        projectId,
+        projectTermsAccepted: true
+      });
+      navigate(redirectPath);
     }
-  }, [selectedServices, projectData, navigate]);
+  }, [projectData, projectId, navigate]);
 
   const onSubmit = (data: DetailsFormValues) => {
     const submissionData = {

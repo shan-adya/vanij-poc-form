@@ -5,12 +5,45 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getStatusConfig } from "@/lib/utils/status";
 import { cn } from "@/lib/utils";
-import { Project } from "@/types/project";
 import { projectsApi } from "@/lib/api/projects";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { formatDate } from '@/lib/utils/date';
 import { Button } from "@/components/ui/button";
 import { PenSquare, Copy, ArrowLeft } from "lucide-react";
+
+interface UserDetails {
+  first_name: string;
+  last_name: string;
+  email: string;
+  mobile_number: string;
+  company_name: string;
+  designation: string;
+  use_case: string;
+  created_at: string;
+}
+
+interface Project {
+  project_name: string;
+  project_description: string;
+  status: string;
+  services: {
+    service_name: string;
+    service_description: string;
+    status: string;
+    cost: string;
+    poc_cost: string;
+    others: {
+      estimated_timeline: string;
+      team_size: number;
+    };
+  }[];
+  tasks: {
+    task_id: string;
+    task_name: string;
+    status: string;
+  }[];
+  user_details?: UserDetails;
+}
 
 export default function ProjectView() {
   const { id } = useParams();
@@ -138,19 +171,13 @@ export default function ProjectView() {
         </Button>
       </div>
 
-      <Card className="p-6 space-y-6">
-        <div className="space-y-4">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-2xl font-semibold">{project.project_name}</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                {project.project_description}
-              </p>
-              <div className="text-sm text-muted-foreground mt-2">
-                Last updated: {format(new Date(project.updated_at), 'MMM dd, yyyy HH:mm')}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
+      <Card className="p-6 space-y-6 w-full">
+        <div className="space-y-4 w-full">
+        <div className="flex justify-between items-start w-full gap-5">
+              <h3 className="text-2xl font-semibold truncate" title={project.project_name}>
+                {project.project_name}
+              </h3>
+              <div className="flex items-center gap-4">
               <Button
                 variant="outline"
                 onClick={handleCopyLink}
@@ -194,9 +221,64 @@ export default function ProjectView() {
                 </SelectContent>
               </Select>
             </div>
-          </div>
+        </div>
+          <div className="flex flex-col items-start w-full">
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2" title={project.project_description}>
+                {project.project_description}
+              </p>
+              <div className="text-sm text-muted-foreground mt-2">
+                Last updated: {formatDate(project.updated_at)}
+              </div>
+            </div>
         </div>
       </Card>
+
+      {project.user_details && (
+        <Card className="p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Client Information</h3>
+            <Badge variant="outline" className="text-primary">
+              Accepted Project
+            </Badge>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <p className="text-sm">
+                <span className="text-muted-foreground">Name: </span>
+                {project.user_details.first_name} {project.user_details.last_name}
+              </p>
+              <p className="text-sm">
+                <span className="text-muted-foreground">Email: </span>
+                {project.user_details.email}
+              </p>
+              <p className="text-sm">
+                <span className="text-muted-foreground">Phone: </span>
+                {project.user_details.mobile_number}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm">
+                <span className="text-muted-foreground">Company: </span>
+                {project.user_details.company_name}
+              </p>
+              <p className="text-sm">
+                <span className="text-muted-foreground">Designation: </span>
+                {project.user_details.designation}
+              </p>
+              <p className="text-sm">
+                <span className="text-muted-foreground">Accepted on: </span>
+                {formatDate(project.user_details.created_at)}
+              </p>
+            </div>
+          </div>
+          {project.user_details.use_case && (
+            <div className="pt-4 border-t">
+              <p className="text-sm font-medium text-muted-foreground mb-2">Use Case:</p>
+              <p className="text-sm">{project.user_details.use_case}</p>
+            </div>
+          )}
+        </Card>
+      )}
 
       {project.services && project.services.length > 0 && (
         <Card className="p-6 space-y-6">
@@ -208,8 +290,10 @@ export default function ProjectView() {
                   <div>
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium">{service.service_name}</p>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="font-medium truncate" title={service.service_name}>
+                          {service.service_name}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2" title={service.service_description}>
                           {service.service_description}
                         </p>
                       </div>
@@ -244,21 +328,21 @@ export default function ProjectView() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm">
+                    <p className="text-sm truncate" title={`Timeline: ${service.others.estimated_timeline}`}>
                       <span className="text-muted-foreground">Timeline: </span>
                       {service.others.estimated_timeline}
                     </p>
-                    <p className="text-sm">
+                    <p className="text-sm truncate" title={`Team Size: ${service.others.team_size} members`}>
                       <span className="text-muted-foreground">Team Size: </span>
                       {service.others.team_size} members
                     </p>
-                    <p className="text-sm">
+                    <p className="text-sm truncate" title={`Total Cost: ${service.cost}`}>
                       <span className="text-muted-foreground">Total Cost: </span>
-                      ${service.cost.toLocaleString()}
+                      {service.cost}
                     </p>
                     <p className="text-sm">
                       <span className="text-muted-foreground">POC Cost: </span>
-                      ${service.poc_cost.toLocaleString()}
+                      {service.poc_cost}
                     </p>
                   </div>
                 </div>
@@ -273,8 +357,11 @@ export default function ProjectView() {
           <h3 className="text-lg font-semibold">Tasks</h3>
           <div className="space-y-4">
             {project.tasks.map((task) => (
-              <div key={task.task_id} className="flex items-center justify-between">
-                <span>{task.task_name}</span>
+              <div 
+                key={task.task_id} 
+                className="flex items-start justify-between p-4 rounded-lg border"
+              >
+                <span className="text-sm whitespace-pre-wrap pr-4">{task.task_name}</span>
                 <Badge className={getStatusConfig(task.status).className}>
                   {getStatusConfig(task.status).label}
                 </Badge>

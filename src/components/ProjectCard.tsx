@@ -33,8 +33,10 @@ export function ProjectCard({ project, isClientView }: ProjectCardProps) {
       <div className="space-y-4">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="font-semibold text-lg">{project.project_name}</h3>
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <h3 className="text-lg font-semibold truncate max-w-60" title={project.project_name}>
+              {project.project_name}
+            </h3>
+            <p className="text-sm text-muted-foreground line-clamp-2" title={project.project_description}>
               {project.project_description}
             </p>
           </div>
@@ -48,7 +50,9 @@ export function ProjectCard({ project, isClientView }: ProjectCardProps) {
           <div className="grid gap-2">
             {services.slice(0, 2).map((service, index) => (
               <div key={index} className="flex items-center justify-between text-sm">
-                <span>{service.service_name}</span>
+                <span className="text-sm truncate" title={service.service_name}>
+                  {service.service_name}
+                </span>
                 <Badge variant="outline" className={getStatusConfig(service.status).className}>
                   {service.others.estimated_timeline}
                 </Badge>

@@ -4,7 +4,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useService } from '@/contexts/ServiceContext';
 import { motion } from 'framer-motion';
 import { ArrowRight, Shield, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { flowUtils } from '@/lib/utils/flowState';
 
 const TERMS = [
   {
@@ -27,7 +28,12 @@ const TERMS = [
 
 export default function Terms() {
   const navigate = useNavigate();
-  const { selectedServices } = useService();
+  const { 
+    selectedServices,
+    projectData,
+    projectId,
+    userDetails
+  } = useService();
   const [acceptedTerms, setAcceptedTerms] = useState<string[]>([]);
 
   const handleTermToggle = (termId: string) => {
@@ -47,6 +53,25 @@ export default function Terms() {
   };
 
   const totalEstimate = selectedServices.reduce((sum, service) => sum + service.price, 0);
+
+  useEffect(() => {
+    const canAccessPage = flowUtils.canAccess('terms', {
+      projectData,
+      projectId,
+      projectTermsAccepted: true,
+      userDetails,
+    });
+
+    if (!canAccessPage) {
+      const redirectPath = flowUtils.getRedirectPath('terms', {
+        projectData,
+        projectId,
+        projectTermsAccepted: true,
+        userDetails,
+      });
+      navigate(redirectPath);
+    }
+  }, [projectData, projectId, userDetails, navigate]);
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getStatusConfig } from "@/lib/utils/status";
 import { Project } from "@/types/project";
 import { projectsApi } from "@/lib/api/projects";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { formatDate } from '@/lib/utils/date';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ export default function ClientProjectView() {
   const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdatingTask, setIsUpdatingTask] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -32,6 +34,39 @@ export default function ClientProjectView() {
 
     fetchProject();
   }, [id]);
+
+  const handleTaskStatusUpdate = async (taskIndex: number, newStatus: string) => {
+    if (!project || !id) return;
+    
+    setIsUpdatingTask(true);
+    try {
+      // Create updated tasks array with new status
+      const updatedTasks = project.tasks.map((task, index) => {
+        if (index === taskIndex) {
+          return {
+            ...task,
+            status: newStatus
+          };
+        }
+        // Return original task without modification
+        return task;
+      });
+
+      // Only send the tasks array in the update
+      const response = await projectsApi.update(id, {
+        ...project,
+        tasks: updatedTasks
+      });
+
+      setProject(response.data);
+      toast.success("Task status updated successfully");
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast.error("Failed to update task status");
+    } finally {
+      setIsUpdatingTask(false);
+    }
+  };
 
   if (isLoading) {
     return <div className="space-y-4">
@@ -65,7 +100,7 @@ export default function ClientProjectView() {
               {project.project_description}
             </p>
             <div className="text-sm text-muted-foreground mt-2">
-              Last updated: {format(new Date(project.updated_at), 'MMM dd, yyyy HH:mm')}
+              Last updated: {formatDate(project.updated_at)}
             </div>
             <Badge className={cn("mt-4", getStatusConfig(project.status).className)}>
               {getStatusConfig(project.status).label}
@@ -103,11 +138,11 @@ export default function ClientProjectView() {
                     </p>
                     <p className="text-sm">
                       <span className="text-muted-foreground">Total Cost: </span>
-                      ${service.cost.toLocaleString()}
+                      {service.cost.toLocaleString()}
                     </p>
                     <p className="text-sm">
                       <span className="text-muted-foreground">POC Cost: </span>
-                      ${service.poc_cost.toLocaleString()}
+                      {service.poc_cost.toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -121,12 +156,47 @@ export default function ClientProjectView() {
         <Card className="p-6 space-y-6">
           <h3 className="text-lg font-semibold">Tasks</h3>
           <div className="space-y-4">
-            {project.tasks.map((task) => (
-              <div key={task.task_id} className="flex items-center justify-between">
-                <span>{task.task_name}</span>
-                <Badge className={getStatusConfig(task.status).className}>
-                  {getStatusConfig(task.status).label}
-                </Badge>
+            {project.tasks.map((task, index) => (
+              <div 
+                key={index} 
+                className="flex items-start justify-between p-4 rounded-lg border"
+              >
+                <span className="text-sm whitespace-pre-wrap pr-4">{task.task_name}</span>
+                {task.task_name !== "Fill up user details" && 
+                 task.task_name !== "Agree to terms" ? (
+                  <Select
+                    value={task.status}
+                    onValueChange={(status) => handleTaskStatusUpdate(index, status)}
+                    disabled={isUpdatingTask}
+                  >
+                    <SelectTrigger 
+                      className={cn(
+                        "w-[140px]",
+                        getStatusConfig(task.status).className
+                      )}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['pending', 'in_progress', 'completed'].map((status) => {
+                        const config = getStatusConfig(status);
+                        return (
+                          <SelectItem 
+                            key={status} 
+                            value={status}
+                            className="py-2"
+                          >
+                            {config.label}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Badge className={getStatusConfig(task.status).className}>
+                    {getStatusConfig(task.status).label}
+                  </Badge>
+                )}
               </div>
             ))}
           </div>
