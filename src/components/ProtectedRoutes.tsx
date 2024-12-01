@@ -5,11 +5,11 @@ export function AdminRoute() {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/vanij-poc/login" replace />;
   }
 
   if (user.role !== "ADMIN") {
-    return <Navigate to="/client" replace />;
+    return <Navigate to="/vanij-poc/client" replace />;
   }
 
   return <Outlet />;
@@ -19,11 +19,11 @@ export function ClientRoute() {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/vanij-poc/login" replace />;
   }
 
   if (user.role === "ADMIN") {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/vanij-poc/admin" replace />;
   }
 
   return <Outlet />;
@@ -33,11 +33,10 @@ export function AuthRoute() {
   const { user } = useAuth();
 
   if (user) {
-    // Redirect based on role
     if (user.role === "ADMIN") {
-      return <Navigate to="/admin" replace />;
+      return <Navigate to="/vanij-poc/admin" replace />;
     }
-    return <Navigate to="/client" replace />;
+    return <Navigate to="/vanij-poc/client" replace />;
   }
 
   return <Outlet />;

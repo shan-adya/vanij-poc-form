@@ -24,11 +24,11 @@ export function AdminRoute() {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/vanij-poc/login" replace />;
   }
 
   if (user.role !== "ADMIN") {
-    return <Navigate to="/client" replace />;
+    return <Navigate to="/vanij-poc/client" replace />;
   }
 
   return <Outlet />;
@@ -38,11 +38,11 @@ export function ClientRoute() {
   const { user } = useAuth();
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/vanij-poc/login" replace />;
   }
 
   if (user.role === "ADMIN") {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/vanij-poc/admin" replace />;
   }
 
   return <Outlet />;
@@ -54,9 +54,9 @@ export function AuthRoute() {
   if (user) {
     // Redirect based on role
     if (user.role === "ADMIN") {
-      return <Navigate to="/admin" replace />;
+      return <Navigate to="/vanij-poc/admin" replace />;
     }
-    return <Navigate to="/client" replace />;
+    return <Navigate to="/vanij-poc/client" replace />;
   }
 
   return <Outlet />;
@@ -66,35 +66,33 @@ export default function App() {
   return (
     <ServiceProvider>
       <FormProvider>
-        <BrowserRouter basename="/vanij-poc">
+        <BrowserRouter>
           <AuthProvider>
             <ScrollToTop />
             <Toaster position="top-center" richColors />
             <Routes>
               {/* Public Routes */}
               <Route element={<AuthRoute />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/" element={<Layout />}>
-                  <Route path="/" element={<ProjectDetails />} />
-                  {/* <Route path="services" element={<ServiceSelection />} /> */}
-                  <Route path="details" element={<Details />} />
-                  <Route path="terms" element={<Terms />} />
-                  <Route path="summary" element={<Summary />} />
+                <Route path="/vanij-poc/login" element={<Login />} />
+                <Route path="/vanij-poc" element={<Layout />}>
+                  <Route path="/vanij-poc" element={<ProjectDetails />} />
+                  <Route path="/vanij-poc/details" element={<Details />} />
+                  <Route path="/vanij-poc/terms" element={<Terms />} />
+                  <Route path="/vanij-poc/summary" element={<Summary />} />
                 </Route>
               </Route>
               
               {/* Protected Client Routes */}
               <Route element={<ClientRoute />}>
-                <Route path="/client" element={<ClientLayout />}>
+                <Route path="/vanij-poc/client" element={<ClientLayout />}>
                   <Route index element={<ClientDashboard />} />
-                  {/* <Route path="profile" element={<>ClientProfile</>} /> */}
                   <Route path="projects/:id" element={<ClientProjectView />} />
                 </Route>
               </Route>
 
               {/* Protected Admin Routes */}
               <Route element={<AdminRoute />}>
-                <Route path="/admin" element={<AdminIndex />}>
+                <Route path="/vanij-poc/admin" element={<AdminIndex />}>
                   <Route index element={<AdminDashboardNew />} />
                   <Route path="projects/new" element={<CreateProject />} />
                   <Route path="projects/:id" element={<ProjectView />} />
@@ -103,7 +101,7 @@ export default function App() {
               </Route>
 
               {/* Catch all route - 404 */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="*" element={<Navigate to="/vanij-poc/login" replace />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

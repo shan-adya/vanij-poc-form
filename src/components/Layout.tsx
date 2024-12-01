@@ -22,7 +22,12 @@ const STEPS = [
 
 export default function Layout() {
   const location = useLocation();
-  const steps = ['/', '/details', '/terms', '/summary'];
+  const steps = [
+    '/vanij-poc',
+    '/vanij-poc/details',
+    '/vanij-poc/terms',
+    '/vanij-poc/summary'
+  ];
   const currentStep = steps.indexOf(location.pathname) + 1;
 
   return (

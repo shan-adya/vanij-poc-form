@@ -56,9 +56,9 @@ export const MOCK_REQUESTS = [
 ];
 
 export const ROUTES = {
-  HOME: '/',
-  SERVICES: '/services',
-  DETAILS: '/details',
-  SUMMARY: '/summary',
-  DASHBOARD: '/dashboard',
+  HOME: '/vanij-poc',
+  SERVICES: '/vanij-poc/services',
+  DETAILS: '/vanij-poc/details',
+  SUMMARY: '/vanij-poc/summary',
+  DASHBOARD: '/vanij-poc/dashboard',
 };
