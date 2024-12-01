@@ -40,11 +40,11 @@ export default function ClientLayout() {
       icon: LayoutDashboard,
       href: "/client",
     },
-    {
-      title: "Profile",
-      icon: User,
-      href: "/client/profile",
-    }
+    // {
+    //   title: "Profile",
+    //   icon: User,
+    //   href: "/client/profile",
+    // }
   ];
 
   return (

@@ -161,7 +161,7 @@ export default function ClientProjectView() {
                 key={index} 
                 className="flex items-start justify-between p-4 rounded-lg border"
               >
-                <span className="text-sm whitespace-pre-wrap pr-4">{task.task_name}</span>
+                <span className="text-sm whitespace-pre-wrap break-all pr-4">{task.task_name}</span>
                 {task.task_name !== "Fill up user details" && 
                  task.task_name !== "Agree to terms" ? (
                   <Select

@@ -87,7 +87,7 @@ export default function App() {
               <Route element={<ClientRoute />}>
                 <Route path="/client" element={<ClientLayout />}>
                   <Route index element={<ClientDashboard />} />
-                  <Route path="profile" element={<>ClientProfile</>} />
+                  {/* <Route path="profile" element={<>ClientProfile</>} /> */}
                   <Route path="projects/:id" element={<ClientProjectView />} />
                 </Route>
               </Route>

@@ -361,7 +361,7 @@ export default function ProjectView() {
                 key={task.task_id} 
                 className="flex items-start justify-between p-4 rounded-lg border"
               >
-                <span className="text-sm whitespace-pre-wrap pr-4">{task.task_name}</span>
+                <span className="text-sm whitespace-pre-wrap break-all pr-4">{task.task_name}</span>
                 <Badge className={getStatusConfig(task.status).className}>
                   {getStatusConfig(task.status).label}
                 </Badge>
