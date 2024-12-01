@@ -32,7 +32,7 @@ export default function AdminDashboardNew() {
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold truncate">Projects</h2>
         <Button 
-          onClick={() => navigate("/admin/projects/new")}
+          onClick={() => navigate("/vanij-poc/admin/projects/new")}
           className="bg-primary hover:bg-primary/90 shrink-0 ml-4"
         >
           <Plus className="h-4 w-4 mr-2" />

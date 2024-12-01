@@ -25,7 +25,7 @@ export default function AdminIndex() {
     {
       title: "Dashboard",
       icon: LayoutDashboard,
-      href: "/admin",
+      href: "/vanij-poc/admin",
     },
     // Add more menu items here as needed
   ];

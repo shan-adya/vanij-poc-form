@@ -38,7 +38,7 @@ export default function ClientLayout() {
     {
       title: "Dashboard",
       icon: LayoutDashboard,
-      href: "/client",
+      href: "/vanij-poc/client",
     },
     // {
     //   title: "Profile",

@@ -23,39 +23,41 @@ interface ServiceContextType {
 
 const ServiceContext = createContext<ServiceContextType | undefined>(undefined);
 
+const STORAGE_PREFIX = 'vanij-poc';
+
 export function ServiceProvider({ children }: { children: React.ReactNode }) {
   const [selectedServices, setSelectedServices] = useState<Service[]>([]);
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [projectData, setProjectData] = useState<Project | null>(() => {
-    const saved = localStorage.getItem('projectData');
+    const saved = localStorage.getItem(`${STORAGE_PREFIX}-projectData`);
     return saved ? JSON.parse(saved) : null;
   });
   const [projectId, setProjectId] = useState<string | null>(() => {
-    return localStorage.getItem('projectId');
+    return localStorage.getItem(`${STORAGE_PREFIX}-projectId`);
   });
 
   // Persist projectData and projectId to localStorage
   useEffect(() => {
     if (projectData) {
-      localStorage.setItem('projectData', JSON.stringify(projectData));
+      localStorage.setItem(`${STORAGE_PREFIX}-projectData`, JSON.stringify(projectData));
     } else {
-      localStorage.removeItem('projectData');
+      localStorage.removeItem(`${STORAGE_PREFIX}-projectData`);
     }
   }, [projectData]);
 
   useEffect(() => {
     if (projectId) {
-      localStorage.setItem('projectId', projectId);
+      localStorage.setItem(`${STORAGE_PREFIX}-projectId`, projectId);
     } else {
-      localStorage.removeItem('projectId');
+      localStorage.removeItem(`${STORAGE_PREFIX}-projectId`);
     }
   }, [projectId]);
 
   const clearProjectData = () => {
     setProjectData(null);
     setProjectId(null);
-    localStorage.removeItem('projectData');
-    localStorage.removeItem('projectId');
+    localStorage.removeItem(`${STORAGE_PREFIX}-projectData`);
+    localStorage.removeItem(`${STORAGE_PREFIX}-projectId`);
   };
 
   return (

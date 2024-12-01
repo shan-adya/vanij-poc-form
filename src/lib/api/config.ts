@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const STORAGE_PREFIX = 'vanij-poc';
+
 // Create axios instance with default config
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -10,7 +12,7 @@ export const api = axios.create({
 
 // Request interceptor for adding auth token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem(`${STORAGE_PREFIX}-token`);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -23,7 +25,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized access
-      localStorage.removeItem('token');
+      localStorage.removeItem(`${STORAGE_PREFIX}-token`);
       window.location.href = '/login';
     }
     return Promise.reject(error);

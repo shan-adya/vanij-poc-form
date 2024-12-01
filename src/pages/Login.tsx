@@ -68,7 +68,7 @@ export default function Login() {
       const verifyResponse = await verifyOTP(userId, data.otp);
     
       //set token
-      localStorage.setItem('token', verifyResponse.data.token);
+      localStorage.setItem('vanij-poc-token', verifyResponse.data.token);
       
       if (!verifyResponse.meta.status) {
         throw new Error(verifyResponse.meta.message || 'OTP verification failed');

@@ -30,7 +30,7 @@ export const authApi = {
     });
     
     if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('vanij-poc-token', response.data.token);
     }
     
     return response.data;
@@ -41,7 +41,7 @@ export const authApi = {
     try {
       await api.post('/auth/logout');
     } finally {
-      localStorage.removeItem('token');
+      localStorage.removeItem('vanij-poc-token');
     }
   },
 

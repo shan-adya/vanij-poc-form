@@ -293,7 +293,7 @@ export default function DetailsForm() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/vanij-poc")}
                     className="gap-2 w-full sm:w-auto"
                   >
                     <ArrowLeft className="h-4 w-4" />

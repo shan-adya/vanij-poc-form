@@ -19,9 +19,9 @@ export function ProjectCard({ project, isClientView }: ProjectCardProps) {
 
   const handleClick = () => {
     if (isClientView) {
-      navigate(`/client/projects/${project.id}`);
+      navigate(`/vanij-poc/client/projects/${project.id}`);
     } else {
-      navigate(`/admin/projects/${project.id}`);
+      navigate(`/vanij-poc/admin/projects/${project.id}`);
     }
   };
 

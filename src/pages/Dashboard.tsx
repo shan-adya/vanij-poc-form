@@ -15,7 +15,7 @@ export default function Dashboard() {
         <h1 className="text-4xl font-bold">Dashboard</h1>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <Button onClick={() => navigate('/')} size="sm">
+          <Button onClick={() => navigate('/vanij-poc')} size="sm">
             <Plus className="h-4 w-4 mr-1" />
             New Request
           </Button>

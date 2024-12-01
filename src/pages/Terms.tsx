@@ -48,7 +48,7 @@ export default function Terms() {
 
   const handleNext = () => {
     if (allTermsAccepted) {
-      navigate('/summary');
+      navigate('/vanij-poc/summary');
     }
   };
 
