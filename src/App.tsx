@@ -66,7 +66,7 @@ export default function App() {
   return (
     <ServiceProvider>
       <FormProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/vanij-poc">
           <AuthProvider>
             <ScrollToTop />
             <Toaster position="top-center" richColors />
