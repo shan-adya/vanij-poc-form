@@ -129,20 +129,20 @@ export default function ClientProjectView() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm">
-                      <span className="text-muted-foreground">Timeline: </span>
-                      {service.others.estimated_timeline}
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-muted-foreground">Team Size: </span>
-                      {service.others.team_size} members
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-muted-foreground">Total Cost: </span>
-                      {service.cost.toLocaleString()}
+                      <span className="text-muted-foreground">POC Timeline: </span>
+                      {service.others.poc_timeline}
                     </p>
                     <p className="text-sm">
                       <span className="text-muted-foreground">POC Cost: </span>
                       {service.poc_cost.toLocaleString()}
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Timeline: </span>
+                      {service.others.estimated_timeline}
+                    </p>
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Total Cost: </span>
+                      {service.cost.toLocaleString()}
                     </p>
                   </div>
                 </div>

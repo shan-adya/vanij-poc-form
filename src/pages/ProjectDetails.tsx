@@ -112,7 +112,7 @@ export default function ProjectDetails() {
     } 
     // If neither exists, redirect to service selection
     else {
-      navigate('/services');
+      navigate('/vanij-poc/services');
     }
   }, [searchParams, setProjectData, setProjectId, projectId, navigate]);
 
@@ -210,7 +210,7 @@ export default function ProjectDetails() {
             <div className="flex justify-center pt-4">
               <Button
                 variant="outline"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/vanij-poc')}
                 className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -225,7 +225,7 @@ export default function ProjectDetails() {
 
   const handleNext = () => {
     if (termsAccepted) {
-      navigate('/details');
+      navigate('/vanij-poc/details');
     }
   };
 

@@ -86,7 +86,7 @@ export default function ServiceSelection() {
 
   const handleNext = () => {
     if (selectedServices.length > 0 && termsAccepted) {
-      navigate('/details');
+      navigate('/vanij-poc/details');
     }
   };
 

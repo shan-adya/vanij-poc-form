@@ -31,7 +31,7 @@ export default function Layout() {
   const currentStep = steps.indexOf(location.pathname) + 1;
 
   return (
-    <div className="h-screen flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col relative overflow-x-hidden">
       {/* <div className="absolute inset-0 animated-gradient opacity-5" />
       <div className="absolute inset-0 bg-grid-white/[0.02]" /> */}
       

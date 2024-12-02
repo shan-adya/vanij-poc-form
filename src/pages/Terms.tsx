@@ -159,7 +159,7 @@ export default function Terms() {
           <Button 
             type="button" 
             variant="outline" 
-            onClick={() => navigate("/details")}
+            onClick={() => navigate("/vanij-poc/details")}
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

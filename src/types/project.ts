@@ -11,7 +11,7 @@ export interface Project {
     status: string;
     others: {
       estimated_timeline: string;
-      team_size: number;
+      poc_timeline: string;
     };
   }>;
   tasks?: Array<{

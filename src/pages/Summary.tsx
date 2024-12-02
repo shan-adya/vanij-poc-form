@@ -135,7 +135,7 @@ export default function Summary() {
 
       // 3. Clear project data and navigate to login
       clearProjectData();
-      navigate('/login');
+      navigate('/vanij-poc/login');
 
     } catch (error) {
       console.error('Error during submission:', error);
@@ -217,7 +217,7 @@ export default function Summary() {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => navigate('/details')}
+                onClick={() => navigate('/vanij-poc/details')}
                 className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />

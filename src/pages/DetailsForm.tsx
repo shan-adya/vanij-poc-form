@@ -79,7 +79,7 @@ export default function DetailsForm() {
     const isOnlyCustomLLM =
       selectedServices.length === 1 && selectedServices[0].id === "custom-llm";
 
-    navigate(isOnlyCustomLLM ? "/summary" : "/terms");
+    navigate(isOnlyCustomLLM ? "/vanij-poc/summary" : "/vanij-poc/terms");
   };
 
   const isOnlyCustomLLM =

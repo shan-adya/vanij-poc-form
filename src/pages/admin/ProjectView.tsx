@@ -34,7 +34,7 @@ interface Project {
     poc_cost: string;
     others: {
       estimated_timeline: string;
-      team_size: number;
+      poc_timeline: string;
     };
   }[];
   tasks: {
@@ -85,7 +85,7 @@ export default function ProjectView() {
           poc_cost: service.poc_cost,
           others: {
             estimated_timeline: service.others.estimated_timeline,
-            team_size: service.others.team_size,
+            poc_timeline: service.others.poc_timeline,
           },
         })),
         tasks: project.tasks?.map(task => ({
@@ -117,7 +117,17 @@ export default function ProjectView() {
         project_name: project.project_name,
         project_description: project.project_description,
         status: project.status,
-        services: updatedServices,
+        services: updatedServices.map(service => ({
+          service_name: service.service_name,
+          service_description: service.service_description,
+          status: service.status,
+          cost: service.cost,
+          poc_cost: service.poc_cost,
+          others: {
+            estimated_timeline: service.others.estimated_timeline,
+            poc_timeline: service.others.poc_timeline,
+          },
+        })),
         tasks: project.tasks?.map(task => ({
           task_id: task.task_id,
           task_name: task.task_name,
@@ -136,7 +146,7 @@ export default function ProjectView() {
 
   const handleCopyLink = () => {
     const hostname = window.location.origin;
-    const link = `${hostname}?projectId=${project?.id}`;
+    const link = `${hostname}/vanij-poc?projectId=${project?.id}`;
     
     navigator.clipboard.writeText(link)
       .then(() => {
@@ -163,7 +173,7 @@ export default function ProjectView() {
       <div className="flex items-center gap-2 mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate("/admin")}
+          onClick={() => navigate("/vanij-poc/admin")}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -187,7 +197,7 @@ export default function ProjectView() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => navigate(`/admin/projects/${project.id}/edit`)}
+                onClick={() => navigate(`/vanij-poc/admin/projects/${project.id}/edit`)}
               >
                 <PenSquare className="h-4 w-4 mr-2" />
                 Edit Project
@@ -328,21 +338,21 @@ export default function ProjectView() {
                     </div>
                   </div>
                   <div className="space-y-2">
+                    <p className="text-sm truncate" title={`POC Timeline: ${service.others.poc_timeline}`}>
+                      <span className="text-muted-foreground">POC Timeline: </span>
+                      {service.others.poc_timeline}
+                    </p>
+                    <p className="text-sm truncate" title={`POC Cost: ${service.poc_cost}`}>
+                      <span className="text-muted-foreground">POC Cost: </span>
+                      {service.poc_cost}
+                    </p>
                     <p className="text-sm truncate" title={`Timeline: ${service.others.estimated_timeline}`}>
                       <span className="text-muted-foreground">Timeline: </span>
                       {service.others.estimated_timeline}
                     </p>
-                    <p className="text-sm truncate" title={`Team Size: ${service.others.team_size} members`}>
-                      <span className="text-muted-foreground">Team Size: </span>
-                      {service.others.team_size} members
-                    </p>
                     <p className="text-sm truncate" title={`Total Cost: ${service.cost}`}>
                       <span className="text-muted-foreground">Total Cost: </span>
                       {service.cost}
-                    </p>
-                    <p className="text-sm">
-                      <span className="text-muted-foreground">POC Cost: </span>
-                      {service.poc_cost}
                     </p>
                   </div>
                 </div>

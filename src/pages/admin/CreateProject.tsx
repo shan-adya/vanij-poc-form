@@ -47,7 +47,7 @@ const createProjectSchema = z.object({
       poc_cost: z.string().min(1, "POC cost is required"),
       others: z.object({
         estimated_timeline: z.string().min(1, "Timeline is required"),
-        team_size: z.string().min(1, "Team size is required"),
+        poc_timeline: z.string().min(1, "POC timeline is required"),
       }),
     })
   ).min(1, "At least one service is required"),
@@ -110,13 +110,13 @@ export default function CreateProject() {
               poc_cost: service.poc_cost.toString(),
               others: {
                 estimated_timeline: service.others.estimated_timeline,
-                team_size: service.others.team_size.toString(),
+                poc_timeline: service.others.poc_timeline,
               },
             })),
           });
         } catch (error) {
           toast.error("Failed to load project");
-          navigate("/admin");
+          navigate("/vanij-poc/admin");
         }
       };
 
@@ -155,7 +155,7 @@ export default function CreateProject() {
           poc_cost: service.poc_cost,
           others: {
             estimated_timeline: service.others.estimated_timeline,
-            team_size: parseInt(service.others.team_size),
+            poc_timeline: service.others.poc_timeline,
           },
         })),
       };
@@ -163,11 +163,12 @@ export default function CreateProject() {
       if (isEditMode) {
         await projectsApi.update(id, formattedData);
         toast.success("Project updated successfully");
+        navigate(`/vanij-poc/admin/projects/${id}`);
       } else {
-        await projectsApi.create(formattedData);
+        const response = await projectsApi.create(formattedData);
         toast.success("Project created successfully");
+        navigate(`/vanij-poc/admin/projects/${response.data.id}`);
       }
-      navigate("/admin");
     } catch (error) {
       toast.error(isEditMode ? "Failed to update project" : "Failed to create project");
     }
@@ -178,7 +179,7 @@ export default function CreateProject() {
       <div className="flex items-center gap-2 mb-6">
         <Button
           variant="ghost"
-          onClick={() => navigate("/admin")}
+          onClick={() => navigate("/vanij-poc/admin")}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -224,7 +225,7 @@ export default function CreateProject() {
             </div>
 
             {/* Tasks Section */}
-            <Card className="p-6 space-y-6">
+            {/* <Card className="p-6 space-y-6">
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="font-semibold">Tasks</h3>
@@ -279,7 +280,7 @@ export default function CreateProject() {
                   );
                 })}
               </div>
-            </Card>
+            </Card> */}
 
             {/* Services Section */}
             <Card className="p-6 space-y-6">
@@ -305,7 +306,7 @@ export default function CreateProject() {
                     poc_cost: "",
                     others: {
                       estimated_timeline: "",
-                      team_size: "",
+                      poc_timeline: "",
                     },
                   })}
                 >
@@ -376,6 +377,36 @@ export default function CreateProject() {
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
+                          name={`services.${index}.poc_cost`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>POC Cost</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="e.g., Free, $50, Contact Us" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name={`services.${index}.others.poc_timeline`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>POC Timeline</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="e.g., 1 month" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
                           name={`services.${index}.cost`}
                           render={({ field }) => (
                             <FormItem>
@@ -390,42 +421,12 @@ export default function CreateProject() {
 
                         <FormField
                           control={form.control}
-                          name={`services.${index}.poc_cost`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>POC Cost</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="e.g., Free, $50, Contact Us" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
                           name={`services.${index}.others.estimated_timeline`}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Estimated Timeline</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="e.g., 3 months" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name={`services.${index}.others.team_size`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Team Size</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="Enter team size" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

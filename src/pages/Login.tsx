@@ -90,9 +90,9 @@ export default function Login() {
       
       // Role-based redirection
       if (userData.role === "ADMIN") {
-        navigate('/admin');
+        navigate('/vanij-poc/admin');
       } else {
-        navigate('/client');
+        navigate('/vanij-poc/client');
       }
     } catch (error) {
       console.error('Login error:', error);
