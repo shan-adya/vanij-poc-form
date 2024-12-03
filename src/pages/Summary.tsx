@@ -25,6 +25,7 @@ export default function Summary() {
   } = useService();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [key: number]: boolean }>({});
   // Add useEffect to check for required data
   useEffect(() => {
     const canAccessPage = flowUtils.canAccess('summary', {
@@ -173,35 +174,51 @@ export default function Summary() {
                   <h3 className="font-semibold truncate" title={service.service_name}>
                     {service.service_name}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2" title={service.service_description}>
-                    {service.service_description}
-                  </p>
+                  <div className="relative">
+                    <p className={cn(
+                      "text-sm text-muted-foreground",
+                      !expandedDescriptions[index] && "line-clamp-2"
+                    )} title={service.service_description}>
+                      {service.service_description}
+                    </p>
+                    {service.service_description.length > 100 && (
+                      <button
+                        onClick={() => setExpandedDescriptions(prev => ({
+                          ...prev,
+                          [index]: !prev[index]
+                        }))}
+                        className="text-xs text-primary hover:text-primary/80 mt-1"
+                      >
+                        {expandedDescriptions[index] ? 'Show less' : 'Read more'}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm truncate" title={service.others.poc_timeline}>
+                    {/* <Clock className="h-4 w-4 text-muted-foreground" /> */}
+                    <span className="text-sm" title={service.others.poc_timeline}>
                       POC Timeline: {service.others.poc_timeline}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm truncate" title={`POC Cost: ${service.poc_cost}`}>
+                    {/* <DollarSign className="h-4 w-4 text-muted-foreground" /> */}
+                    <span className="text-sm" title={`POC Cost: ${service.poc_cost}`}>
                       POC Cost: {service.poc_cost}
                     </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm truncate" title={service.others.estimated_timeline}>
+                    {/* <Clock className="h-4 w-4 text-muted-foreground" /> */}
+                    <span className="text-sm" title={service.others.estimated_timeline}>
                       Final Timeline: {service.others.estimated_timeline}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm truncate" title={`Cost: ${service.cost}`}>
+                  <div className="flex items-center gap-2 col-span-2">
+                    {/* <DollarSign className="h-4 w-4 text-muted-foreground" /> */}
+                    <span className="text-sm" title={`Cost: ${service.cost}`}>
                       Cost: {service.cost}
                     </span>
                   </div>
