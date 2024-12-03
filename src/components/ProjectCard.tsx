@@ -3,7 +3,15 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { getStatusConfig } from '@/lib/utils/status';
 import { useNavigate } from 'react-router-dom';
-import { DropdownMenu } from '@/components/ui/dropdown-menu';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { MoreVertical, PenSquare, Copy, CopyPlus } from 'lucide-react';
+import { toast } from 'sonner';
+import { projectsApi } from '@/lib/api/projects';
 
 interface ProjectCardProps {
   project: Project;
@@ -17,7 +25,12 @@ export function ProjectCard({ project, isClientView }: ProjectCardProps) {
   // Default to empty array if services is null
   const services = project.services || [];
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking the dropdown menu
+    if ((e.target as HTMLElement).closest('.dropdown-trigger')) {
+      return;
+    }
+    
     if (isClientView) {
       navigate(`/vanij-poc/client/projects/${project.id}`);
     } else {
@@ -25,9 +38,44 @@ export function ProjectCard({ project, isClientView }: ProjectCardProps) {
     }
   };
 
+  const handleCopyLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const hostname = window.location.origin;
+    const link = `${hostname}/vanij-poc?projectId=${project.id}`;
+    
+    navigator.clipboard.writeText(link)
+      .then(() => toast.success("Link copied to clipboard"))
+      .catch(() => toast.error("Failed to copy link"));
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/vanij-poc/admin/projects/${project.id}/edit`);
+  };
+
+  const handleClone = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const cloneData = {
+        project_name: `${project.project_name} (Clone)`,
+        project_description: project.project_description,
+        status: 'active',
+        services: project.services,
+        tasks: project.tasks,
+      };
+      
+      // Assuming you have access to projectsApi here
+      const response = await projectsApi.create(cloneData);
+      toast.success("Project cloned successfully");
+      navigate(`/vanij-poc/admin/projects/${response.data.id}`);
+    } catch (error) {
+      toast.error("Failed to clone project");
+    }
+  };
+
   return (
     <Card 
-      className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+      className="p-6 hover:shadow-lg transition-shadow cursor-pointer relative"
       onClick={handleClick}
     >
       <div className="space-y-4">
@@ -40,9 +88,32 @@ export function ProjectCard({ project, isClientView }: ProjectCardProps) {
               {project.project_description}
             </p>
           </div>
-          <Badge className={statusConfig.className}>
-            {statusConfig.label}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={statusConfig.className}>
+              {statusConfig.label}
+            </Badge>
+            {!isClientView && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="dropdown-trigger" onClick={e => e.stopPropagation()}>
+                  <MoreVertical className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleEdit}>
+                    <PenSquare className="h-4 w-4 mr-2" />
+                    Edit Project
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleClone}>
+                    <CopyPlus className="h-4 w-4 mr-2" />
+                    Clone Project
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleCopyLink}>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Link
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         <div className="space-y-2">

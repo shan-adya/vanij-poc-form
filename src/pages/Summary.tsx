@@ -14,6 +14,7 @@ import UserDetailsSummary from '@/components/UserDetailsSummary';
 import { userApi } from '@/lib/api/user';
 import { projectsApi } from '@/lib/api/projects';
 import { flowUtils } from '@/lib/utils/flowState';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function Summary() {
   const navigate = useNavigate();
@@ -156,7 +157,9 @@ export default function Summary() {
         {/* Project Details */}
         <div className="text-center">
           <h1 className="text-3xl font-bold">{projectData?.project_name}</h1>
-          <p className="text-muted-foreground mt-2">{projectData?.project_description}</p>
+          <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+            <pre className="text-muted-foreground mt-2 whitespace-pre-wrap text-start">{projectData?.project_description}</pre>
+          </ScrollArea> 
         </div>
 
         {/* Services */}
