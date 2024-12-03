@@ -9,7 +9,7 @@ import { projectsApi } from "@/lib/api/projects";
 import { toast } from "sonner";
 import { formatDate } from '@/lib/utils/date';
 import { Button } from "@/components/ui/button";
-import { PenSquare, Copy, ArrowLeft } from "lucide-react";
+import { PenSquare, Copy, ArrowLeft, CopyPlus } from "lucide-react";
 
 interface UserDetails {
   first_name: string;
@@ -157,6 +157,29 @@ export default function ProjectView() {
       });
   };
 
+  const handleCloneProject = async () => {
+    if (!project || !id) return;
+    
+    setIsUpdating(true);
+    try {
+      const cloneData = {
+        project_name: `${project.project_name} (Clone)`,
+        project_description: project.project_description,
+        status: 'active',
+        services: project.services,
+        tasks: project.tasks,
+      };
+      
+      const response = await projectsApi.create(cloneData);
+      toast.success("Project cloned successfully");
+      navigate(`/vanij-poc/admin/projects/${response.data.id}`);
+    } catch (error) {
+      toast.error("Failed to clone project");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   if (isLoading) {
     return <div className="space-y-4">
       <div className="h-8 bg-muted animate-pulse rounded" />
@@ -170,78 +193,91 @@ export default function ProjectView() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/vanij-poc/admin")}
-          className="gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Projects
-        </Button>
-      </div>
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/vanij-poc/admin")}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Projects
+          </Button>
+          <Select
+            value={project.status}
+            onValueChange={handleStatusUpdate}
+            disabled={isUpdating}
+          >
+            <SelectTrigger 
+              className={cn(
+                "w-[180px]",
+                getStatusConfig(project.status).className
+              )}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {['active', 'in_progress', 'completed', 'on_hold'].map((status) => {
+                const config = getStatusConfig(status);
+                return (
+                  <SelectItem 
+                    key={status} 
+                    value={status}
+                    className="py-2"
+                  >
+                    {config.label}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <Card className="p-6 space-y-6 w-full">
-        <div className="space-y-4 w-full">
-        <div className="flex justify-between items-start w-full gap-5">
-              <h3 className="text-2xl font-semibold truncate" title={project.project_name}>
+        <Card className="p-6">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <h3 className="text-2xl font-semibold" title={project.project_name}>
                 {project.project_name}
               </h3>
-              <div className="flex items-center gap-4">
+              <p className="text-sm text-muted-foreground" title={project.project_description}>
+                {project.project_description}
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant="default"
+                onClick={() => navigate(`/vanij-poc/admin/projects/${project.id}/edit`)}
+                className="gap-2"
+              >
+                <PenSquare className="h-4 w-4" />
+                Edit Project
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleCloneProject}
+                disabled={isUpdating}
+                className="gap-2"
+              >
+                <CopyPlus className="h-4 w-4" />
+                Clone Project
+              </Button>
               <Button
                 variant="outline"
                 onClick={handleCopyLink}
+                className="gap-2"
               >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Link
+                <Copy className="h-4 w-4" />
+                Share Link
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate(`/vanij-poc/admin/projects/${project.id}/edit`)}
-              >
-                <PenSquare className="h-4 w-4 mr-2" />
-                Edit Project
-              </Button>
-              <Select
-                value={project.status}
-                onValueChange={handleStatusUpdate}
-                disabled={isUpdating}
-              >
-                <SelectTrigger 
-                  className={cn(
-                    "w-[180px]",
-                    getStatusConfig(project.status).className
-                  )}
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {['active', 'in_progress', 'completed', 'on_hold'].map((status) => {
-                    const config = getStatusConfig(status);
-                    return (
-                      <SelectItem 
-                        key={status} 
-                        value={status}
-                        className="py-2"
-                      >
-                        {config.label}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
             </div>
-        </div>
-          <div className="flex flex-col items-start w-full">
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2" title={project.project_description}>
-                {project.project_description}
-              </p>
-              <div className="text-sm text-muted-foreground mt-2">
-                Last updated: {formatDate(project.updated_at)}
-              </div>
+
+            <div className="text-sm text-muted-foreground">
+              Last updated: {formatDate(project.updated_at)}
             </div>
-        </div>
-      </Card>
+          </div>
+        </Card>
+      </div>
 
       {project.user_details && (
         <Card className="p-6 space-y-6">
