@@ -9,21 +9,35 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { MoreVertical, PenSquare, Copy, CopyPlus } from 'lucide-react';
+import { MoreVertical, PenSquare, Copy, CopyPlus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { projectsApi } from '@/lib/api/projects';
+import { useState } from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ProjectCardProps {
   project: Project;
   isClientView?: boolean;
+  onDelete?: () => void;
 }
 
-export function ProjectCard({ project, isClientView }: ProjectCardProps) {
+export function ProjectCard({ project, isClientView, onDelete }: ProjectCardProps) {
   const navigate = useNavigate();
   const statusConfig = getStatusConfig(project.status);
 
   // Default to empty array if services is null
   const services = project.services || [];
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking the dropdown menu
@@ -73,81 +87,129 @@ export function ProjectCard({ project, isClientView }: ProjectCardProps) {
     }
   };
 
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await projectsApi.delete(project.id);
+      toast.success("Project deleted successfully");
+      if (onDelete) {
+        onDelete();
+      }
+    } catch (error) {
+      toast.error("Failed to delete project");
+    }
+    setShowDeleteDialog(false);
+  };
+
   return (
-    <Card 
-      className="p-6 hover:shadow-lg transition-shadow cursor-pointer relative"
-      onClick={handleClick}
-    >
-      <div className="space-y-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold truncate max-w-60" title={project.project_name}>
-              {project.project_name}
-            </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2" title={project.project_description}>
-              {project.project_description}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge className={statusConfig.className}>
-              {statusConfig.label}
-            </Badge>
-            {!isClientView && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="dropdown-trigger" onClick={e => e.stopPropagation()}>
-                  <MoreVertical className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleEdit}>
-                    <PenSquare className="h-4 w-4 mr-2" />
-                    Edit Project
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleClone}>
-                    <CopyPlus className="h-4 w-4 mr-2" />
-                    Clone Project
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleCopyLink}>
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy Link
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Services ({services.length})</p>
-          <div className="grid gap-2">
-            {services.slice(0, 2).map((service, index) => (
-              <div key={index} className="flex items-center justify-between text-sm">
-                <span className="text-sm truncate" title={service.service_name}>
-                  {service.service_name}
-                </span>
-                <Badge variant="outline" className={getStatusConfig(service.status).className}>
-                  {service.others.estimated_timeline}
-                </Badge>
-              </div>
-            ))}
-            {services.length > 2 && (
-              <p className="text-sm text-muted-foreground text-right">
-                +{services.length - 2} more services
+    <>
+      <Card 
+        className="p-6 hover:shadow-lg transition-shadow cursor-pointer relative"
+        onClick={handleClick}
+      >
+        <div className="space-y-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-lg font-semibold truncate max-w-60" title={project.project_name}>
+                {project.project_name}
+              </h3>
+              <p className="text-sm text-muted-foreground line-clamp-2" title={project.project_description}>
+                {project.project_description}
               </p>
-            )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className={statusConfig.className}>
+                {statusConfig.label}
+              </Badge>
+              {!isClientView && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="dropdown-trigger" onClick={e => e.stopPropagation()}>
+                    <MoreVertical className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleEdit}>
+                      <PenSquare className="h-4 w-4 mr-2" />
+                      Edit Project
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleClone}>
+                      <CopyPlus className="h-4 w-4 mr-2" />
+                      Clone Project
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleCopyLink}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Link
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={handleDelete}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Project
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
-        </div>
 
-        {project.tasks && project.tasks.length > 0 && (
-          <div className="pt-4 border-t">
-            <p className="text-sm text-muted-foreground">
-              Latest Task: {project.tasks[0].task_name} - 
-              <span className={getStatusConfig(project.tasks[0].status).className + " px-2 py-0.5 rounded text-xs"}>
-                {getStatusConfig(project.tasks[0].status).label}
-              </span>
-            </p>
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Services ({services.length})</p>
+            <div className="grid gap-2">
+              {services.slice(0, 2).map((service, index) => (
+                <div key={index} className="flex items-center justify-between text-sm">
+                  <span className="text-sm truncate" title={service.service_name}>
+                    {service.service_name}
+                  </span>
+                  <Badge variant="outline" className={getStatusConfig(service.status).className}>
+                    {service.others.estimated_timeline}
+                  </Badge>
+                </div>
+              ))}
+              {services.length > 2 && (
+                <p className="text-sm text-muted-foreground text-right">
+                  +{services.length - 2} more services
+                </p>
+              )}
+            </div>
           </div>
-        )}
-      </div>
-    </Card>
+
+          {project.tasks && project.tasks.length > 0 && (
+            <div className="pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Latest Task: {project.tasks[0].task_name} - 
+                <span className={getStatusConfig(project.tasks[0].status).className + " px-2 py-0.5 rounded text-xs"}>
+                  {getStatusConfig(project.tasks[0].status).label}
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the project
+              and all its associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 } 

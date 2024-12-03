@@ -56,7 +56,7 @@ export const projectsApi = {
 
   // Delete project
   delete: async (id: string) => {
-    await api.delete(`/projects/${id}`);
+    await api.delete(`/project/delete/${id}`);
   },
 
   updateServiceStatus: async (projectId: string | number, serviceIndex: number, status: string) => {

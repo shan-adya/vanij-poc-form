@@ -12,18 +12,18 @@ export default function AdminDashboardNew() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await projectsApi.getAll();
-        setProjects(response.data);
-      } catch (error) {
-        toast.error("Failed to load projects");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchProjects = async () => {
+    try {
+      const response = await projectsApi.getAll();
+      setProjects(response.data);
+    } catch (error) {
+      toast.error("Failed to load projects");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProjects();
   }, []);
 
@@ -50,7 +50,10 @@ export default function AdminDashboardNew() {
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
           {projects.map((project) => (
             <div key={project.id} className="min-w-0">
-              <ProjectCard project={project} />
+              <ProjectCard 
+                project={project} 
+                onDelete={fetchProjects}
+              />
             </div>
           ))}
         </div>
