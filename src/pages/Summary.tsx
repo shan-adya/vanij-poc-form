@@ -170,8 +170,10 @@ export default function Summary() {
                 className="border rounded-lg p-4 space-y-4"
               >
                 <div>
-                  <h3 className="font-semibold">{service.service_name}</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="font-semibold truncate" title={service.service_name}>
+                    {service.service_name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2" title={service.service_description}>
                     {service.service_description}
                   </p>
                 </div>
@@ -179,19 +181,27 @@ export default function Summary() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      Timeline: {service.others.estimated_timeline}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
-                      Team Size: {service.others.team_size} members
+                    <span className="text-sm truncate" title={service.others.poc_timeline}>
+                      POC Timeline: {service.others.poc_timeline}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">
+                    <span className="text-sm truncate" title={`POC Cost: ${service.poc_cost}`}>
+                      POC Cost: {service.poc_cost}
+                    </span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm truncate" title={service.others.estimated_timeline}>
+                      Final Timeline: {service.others.estimated_timeline}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm truncate" title={`Cost: ${service.cost}`}>
                       Cost: {service.cost}
                     </span>
                   </div>
