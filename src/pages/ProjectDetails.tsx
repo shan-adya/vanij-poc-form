@@ -266,17 +266,17 @@ export default function ProjectDetails() {
                 key={index}
                 className="border rounded-lg p-4 space-y-4"
               >
-                <div>
+                <div className='flex flex-col gap-2'>
                   <h3 className="font-semibold truncate" title={service.service_name}>
                     {service.service_name}
                   </h3>
                   <div className="relative">
-                    <p className={cn(
+                    <div className={cn(
                       "text-sm text-muted-foreground",
                       !expandedDescriptions[index] && "line-clamp-2"
-                    )} title={service.service_description}>
-                      {service.service_description}
-                    </p>
+                    )}>
+                      <pre className="whitespace-pre-wrap">{service.service_description}</pre>
+                    </div>
                     {service.service_description.length > 100 && (
                       <button
                         onClick={() => setExpandedDescriptions(prev => ({
